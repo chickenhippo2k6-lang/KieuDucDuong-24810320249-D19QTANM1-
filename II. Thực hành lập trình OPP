@@ -1,7 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 abstract class PhuongTien
 {
@@ -76,12 +75,13 @@ abstract class PhuongTien
 
     public virtual string GetInfo()
     {
-        return $"Mã PT: {MaPT} | " +
-               $"Hãng: {TenHang} | " +
-               $"Năm SX: {NamSanXuat} | " +
-               $"Giá gốc: {GiaGoc:N0} VNĐ";
+        return "Mã PT: " + MaPT +
+               " | Hãng: " + TenHang +
+               " | Năm SX: " + NamSanXuat +
+               " | Giá gốc: " + GiaGoc.ToString("N0") + " VNĐ";
     }
 }
+
 
 class OTo : PhuongTien
 {
@@ -141,11 +141,13 @@ class OTo : PhuongTien
 
     public override string GetInfo()
     {
-        return base.GetInfo()
-               + $" | Số chỗ: {SoChoNgoi}"
-               + $" | Động cơ: {DungTichDongCo} L";
+        return base.GetInfo() +
+               " | Số chỗ: " + SoChoNgoi +
+               " | Dung tích động cơ: " +
+               DungTichDongCo + " L";
     }
 }
+
 
 class XeMay : PhuongTien
 {
@@ -178,24 +180,28 @@ class XeMay : PhuongTien
     public override decimal TinhGiaLanBanh()
     {
         if (DungTichXylanh < 175)
-        {
             return GiaGoc + GiaGoc * 0.02m;
-        }
 
         return GiaGoc + GiaGoc * 0.05m;
     }
 
     public override string GetInfo()
     {
-        return base.GetInfo()
-               + $" | Xy-lanh: {DungTichXylanh} cc";
+        return base.GetInfo() +
+               " | Dung tích xy-lanh: " +
+               DungTichXylanh + " cc";
     }
 }
 
+
 class QuanLyPhuongTien
 {
-    private List<PhuongTien> danhSach =
-        new List<PhuongTien>();
+    private List<PhuongTien> danhSach;
+
+    public QuanLyPhuongTien()
+    {
+        danhSach = new List<PhuongTien>();
+    }
 
     public void AddPhuongTien(PhuongTien pt)
     {
@@ -204,15 +210,21 @@ class QuanLyPhuongTien
 
     public void DisplayAll()
     {
-        Console.WriteLine();
-        Console.WriteLine("DANH SÁCH PHƯƠNG TIỆN");
+        if (danhSach.Count == 0)
+        {
+            Console.WriteLine("Danh sách phương tiện trống!");
+            return;
+        }
 
         foreach (PhuongTien pt in danhSach)
         {
             Console.WriteLine(pt.GetInfo());
             Console.WriteLine(
-                $"Giá lăn bánh: {pt.TinhGiaLanBanh():N0} VNĐ");
-            Console.WriteLine();
+                "Giá lăn bánh: " +
+                pt.TinhGiaLanBanh().ToString("N0") +
+                " VNĐ");
+
+            Console.WriteLine("--------------------------------");
         }
     }
 
@@ -236,94 +248,406 @@ class QuanLyPhuongTien
     }
 }
 
+
 class Program
 {
-    static void Main()
+    static void Main(string[] args)
     {
-        Console.OutputEncoding = Encoding.UTF8;
-        Console.InputEncoding = Encoding.UTF8;
-
-        QuanLyPhuongTien ql =
+        QuanLyPhuongTien quanLy =
             new QuanLyPhuongTien();
 
-        Console.WriteLine("TC01 - KIỂM TRA VALIDATION");
+        while (true)
+        {
+            Console.WriteLine();
+            Console.WriteLine("================================");
+            Console.WriteLine(" QUAN LY PHUONG TIEN AUTOSPEED");
+            Console.WriteLine("================================");
+            Console.WriteLine("1. Them o to");
+            Console.WriteLine("2. Them xe may");
+            Console.WriteLine("3. Hien thi danh sach");
+            Console.WriteLine("4. Tim gia lan banh cao nhat");
+            Console.WriteLine("5. Tim theo ten hang");
+            Console.WriteLine("6. Chay test case");
+            Console.WriteLine("0. Thoat");
+            Console.WriteLine("================================");
+
+            Console.Write("Nhap lua chon: ");
+            string chon = Console.ReadLine();
+
+            try
+            {
+                switch (chon)
+                {
+                    case "1":
+                        ThemOTo(quanLy);
+                        break;
+
+                    case "2":
+                        ThemXeMay(quanLy);
+                        break;
+
+                    case "3":
+                        quanLy.DisplayAll();
+                        break;
+
+                    case "4":
+                        TimMax(quanLy);
+                        break;
+
+                    case "5":
+                        TimTheoTen(quanLy);
+                        break;
+
+                    case "6":
+                        ChayTestCase();
+                        break;
+
+                    case "0":
+                        return;
+
+                    default:
+                        Console.WriteLine("Lua chon khong hop le!");
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Loi: " + ex.Message);
+            }
+        }
+    }
+
+
+    static void ThemOTo(QuanLyPhuongTien quanLy)
+    {
+        Console.Write("Ma PT: ");
+        string maPT = Console.ReadLine();
+
+        Console.Write("Ten hang: ");
+        string tenHang = Console.ReadLine();
+
+        Console.Write("Nam san xuat: ");
+        int nam = int.Parse(Console.ReadLine());
+
+        Console.Write("Gia goc: ");
+        decimal gia = decimal.Parse(Console.ReadLine());
+
+        Console.Write("So cho ngoi: ");
+        int soCho = int.Parse(Console.ReadLine());
+
+        Console.Write("Dung tich dong co (L): ");
+        double dungTich = double.Parse(
+            Console.ReadLine());
+
+        OTo oto = new OTo(
+            maPT,
+            tenHang,
+            nam,
+            gia,
+            soCho,
+            dungTich);
+
+        quanLy.AddPhuongTien(oto);
+
+        Console.WriteLine("Them o to thanh cong!");
+    }
+
+
+    static void ThemXeMay(QuanLyPhuongTien quanLy)
+    {
+        Console.Write("Ma PT: ");
+        string maPT = Console.ReadLine();
+
+        Console.Write("Ten hang: ");
+        string tenHang = Console.ReadLine();
+
+        Console.Write("Nam san xuat: ");
+        int nam = int.Parse(Console.ReadLine());
+
+        Console.Write("Gia goc: ");
+        decimal gia = decimal.Parse(Console.ReadLine());
+
+        Console.Write("Dung tich xy-lanh (cc): ");
+        int dungTich = int.Parse(
+            Console.ReadLine());
+
+        XeMay xeMay = new XeMay(
+            maPT,
+            tenHang,
+            nam,
+            gia,
+            dungTich);
+
+        quanLy.AddPhuongTien(xeMay);
+
+        Console.WriteLine("Them xe may thanh cong!");
+    }
+
+
+    static void TimMax(QuanLyPhuongTien quanLy)
+    {
+        PhuongTien pt =
+            quanLy.FindMaxGiaLanBanh();
+
+        if (pt == null)
+        {
+            Console.WriteLine("Danh sach rong!");
+            return;
+        }
+
+        Console.WriteLine();
+        Console.WriteLine(
+            "Phuong tien co gia lan banh cao nhat:");
+
+        Console.WriteLine(pt.GetInfo());
+
+        Console.WriteLine(
+            "Gia lan banh: " +
+            pt.TinhGiaLanBanh().ToString("N0") +
+            " VNĐ");
+    }
+
+
+    static void TimTheoTen(QuanLyPhuongTien quanLy)
+    {
+        Console.Write("Nhap ten hang can tim: ");
+        string keyword = Console.ReadLine();
+
+        List<PhuongTien> ketQua =
+            quanLy.SearchByName(keyword);
+
+        if (ketQua.Count == 0)
+        {
+            Console.WriteLine("Khong tim thay!");
+            return;
+        }
+
+        foreach (PhuongTien pt in ketQua)
+        {
+            Console.WriteLine(pt.GetInfo());
+
+            Console.WriteLine(
+                "Gia lan banh: " +
+                pt.TinhGiaLanBanh().ToString("N0") +
+                " VNĐ");
+
+            Console.WriteLine("--------------------------------");
+        }
+    }
+
+
+    static void ChayTestCase()
+    {
+        Console.WriteLine();
+        Console.WriteLine("======================================");
+        Console.WriteLine("         CHAY CAC TEST CASE");
+        Console.WriteLine("======================================");
+
+        TestTC01();
+        TestTC02();
+        TestTC03();
+        TestTC04();
+        TestTC05();
+    }
+
+
+    static void TestTC01()
+    {
+        Console.WriteLine("\nTC01 - Validation nam san xuat");
 
         try
         {
-            OTo otoLoi = new OTo(
-                "PT001",
+            OTo oto = new OTo(
+                "OT001",
                 "Toyota",
                 1850,
                 1000000000m,
                 5,
                 2.0);
+
+            Console.WriteLine(
+                "FAIL - Khong phat sinh ngoai le!");
         }
         catch (ArgumentException ex)
         {
-            Console.WriteLine("Đã bắt lỗi: " + ex.Message);
+            if (ex.Message == "Năm sản xuất không hợp lệ!")
+            {
+                Console.WriteLine(
+                    "PASS - Da phat sinh ArgumentException");
+                Console.WriteLine(
+                    "Message: " + ex.Message);
+            }
+            else
+            {
+                Console.WriteLine(
+                    "FAIL - Sai noi dung exception");
+            }
         }
+    }
 
-        Console.WriteLine();
-        Console.WriteLine("TC02 - TÍNH GIÁ LĂN BÁNH Ô TÔ");
+
+    static void TestTC02()
+    {
+        Console.WriteLine("\nTC02 - Tinh gia lan banh O To");
 
         OTo oto = new OTo(
-            "PT002",
+            "OT001",
             "Toyota",
             2024,
             1000000000m,
             5,
             2.0);
 
-        Console.WriteLine(oto.GetInfo());
-        Console.WriteLine(
-            $"Giá lăn bánh: {oto.TinhGiaLanBanh():N0} VNĐ");
+        decimal ketQua =
+            oto.TinhGiaLanBanh();
 
-        Console.WriteLine();
-        Console.WriteLine("TC03 - TÍNH GIÁ LĂN BÁNH XE MÁY");
+        decimal expected =
+            1420000000m;
+
+        if (ketQua == expected)
+        {
+            Console.WriteLine(
+                "PASS - Gia lan banh = 1,420,000,000 VNĐ");
+        }
+        else
+        {
+            Console.WriteLine(
+                "FAIL - Ket qua = " +
+                ketQua.ToString("N0"));
+        }
+    }
+
+
+    static void TestTC03()
+    {
+        Console.WriteLine("\nTC03 - Tinh gia lan banh Xe May");
 
         XeMay xeMay = new XeMay(
-            "PT003",
+            "XM001",
             "Honda",
             2024,
             50000000m,
             150);
 
-        Console.WriteLine(xeMay.GetInfo());
-        Console.WriteLine(
-            $"Giá lăn bánh: {xeMay.TinhGiaLanBanh():N0} VNĐ");
+        decimal ketQua =
+            xeMay.TinhGiaLanBanh();
 
-        Console.WriteLine();
-        Console.WriteLine("TC04 - KIỂM TRA ĐA HÌNH");
+        decimal expected =
+            51000000m;
 
-        ql.AddPhuongTien(oto);
-        ql.AddPhuongTien(xeMay);
-
-        ql.DisplayAll();
-
-        Console.WriteLine();
-        Console.WriteLine("TC05 - TÌM GIÁ LĂN BÁNH CAO NHẤT");
-
-        PhuongTien max = ql.FindMaxGiaLanBanh();
-
-        Console.WriteLine(
-            "Phương tiện có giá lăn bánh cao nhất:");
-
-        Console.WriteLine(max.GetInfo());
-
-        Console.WriteLine(
-            $"Giá lăn bánh: {max.TinhGiaLanBanh():N0} VNĐ");
-
-        Console.WriteLine();
-        Console.WriteLine("TÌM KIẾM THEO TÊN HÃNG");
-
-        List<PhuongTien> ketQua =
-            ql.SearchByName("Toyota");
-
-        foreach (PhuongTien pt in ketQua)
+        if (ketQua == expected)
         {
-            Console.WriteLine(pt.GetInfo());
+            Console.WriteLine(
+                "PASS - Gia lan banh = 51,000,000 VNĐ");
+        }
+        else
+        {
+            Console.WriteLine(
+                "FAIL - Ket qua = " +
+                ketQua.ToString("N0"));
+        }
+    }
+
+
+    static void TestTC04()
+    {
+        Console.WriteLine("\nTC04 - Kiem tra da hinh");
+
+        List<PhuongTien> danhSach =
+            new List<PhuongTien>();
+
+        danhSach.Add(
+            new OTo(
+                "OT001",
+                "Toyota",
+                2024,
+                1000000000m,
+                5,
+                2.0));
+
+        danhSach.Add(
+            new XeMay(
+                "XM001",
+                "Honda",
+                2024,
+                50000000m,
+                150));
+
+        bool dung = true;
+
+        foreach (PhuongTien pt in danhSach)
+        {
+            decimal gia =
+                pt.TinhGiaLanBanh();
+
+            Console.WriteLine(
+                pt.GetType().Name +
+                " -> " +
+                gia.ToString("N0") +
+                " VNĐ");
+
+            if (pt is OTo && gia != 1420000000m)
+                dung = false;
+
+            if (pt is XeMay && gia != 51000000m)
+                dung = false;
         }
 
-        Console.ReadKey();
+        if (dung)
+        {
+            Console.WriteLine(
+                "PASS - Da hinh hoat dong dung");
+        }
+        else
+        {
+            Console.WriteLine(
+                "FAIL - Cong thuc khong dung");
+        }
+    }
+
+
+    static void TestTC05()
+    {
+        Console.WriteLine(
+            "\nTC05 - Tim gia lan banh cao nhat");
+
+        QuanLyPhuongTien quanLy =
+            new QuanLyPhuongTien();
+
+        OTo oto = new OTo(
+            "OT001",
+            "Toyota",
+            2024,
+            1000000000m,
+            5,
+            2.0);
+
+        XeMay xeMay = new XeMay(
+            "XM001",
+            "Honda",
+            2024,
+            50000000m,
+            150);
+
+        quanLy.AddPhuongTien(oto);
+        quanLy.AddPhuongTien(xeMay);
+
+        PhuongTien max =
+            quanLy.FindMaxGiaLanBanh();
+
+        if (max == oto &&
+            max.TinhGiaLanBanh() == 1420000000m)
+        {
+            Console.WriteLine(
+                "PASS - Tim dung O To 5 cho");
+            Console.WriteLine(
+                "Gia lan banh = 1,420,000,000 VNĐ");
+        }
+        else
+        {
+            Console.WriteLine(
+                "FAIL - Tim sai phuong tien");
+        }
     }
 }
+
